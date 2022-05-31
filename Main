@@ -1,0 +1,114 @@
+from Functions import Graph
+from Functions import dijkstra_algorithm
+from Functions import print_result
+import numpy as np
+import random
+import networkx as nx
+import matplotlib.pyplot as plt
+
+
+
+nodos= ["Estudiar","Graduarse","Trabajo","Ganar Loteria",
+        "Emprender","Negocios Ilegales","Sugar","Casa" ] #Nombres de los nodos
+
+pesos= np.ones(14)
+for x in range(14):                     #Se generan pesos random para las aristas
+    pesos[x] = random.randint(1,10)
+
+init_graph = {}         #Se inicializa el nodo
+for node in nodos:      #Se introducen tanto nombres de nodos como pesos al grafo
+    init_graph[node] = {}     
+init_graph["Estudiar"]["Graduarse"] = pesos[0]
+init_graph["Estudiar"]["Trabajo"] = pesos[1]
+init_graph["Estudiar"]["Ganar Loteria"] = pesos[2]
+init_graph["Graduarse"]["Emprender"] = pesos[3]
+init_graph["Graduarse"]["Trabajo"] = pesos[4]
+init_graph["Trabajo"]["Ganar Loteria"] = pesos[5]
+init_graph["Ganar Loteria"]["Casa"] = pesos[6]
+init_graph["Trabajo"]["Emprender"] = pesos[7]
+init_graph["Trabajo"]["Negocios Ilegales"] = pesos[8]
+init_graph["Trabajo"]["Sugar"] = pesos[9]
+init_graph["Emprender"]["Casa"] = pesos[10]
+init_graph["Negocios Ilegales"]["Casa"] = pesos[11]
+init_graph["Emprender"]["Negocios Ilegales"] = pesos[12]
+init_graph["Sugar"]["Casa"] = pesos[13]
+
+graph = Graph(nodos, init_graph)    #Construimos el grafo
+#Llamamos al Algoritmo Dijkstra
+previous_nodes, shortest_path = dijkstra_algorithm(graph=graph,start_node="Estudiar")
+#Funcion de imprimir el resultado
+Path= print_result(previous_nodes, shortest_path, start_node="Estudiar",target_node="Casa")
+Path.reverse() #Imprime arreglo path
+#print(Path)
+#print(nodos)
+
+
+Grafo = nx.Graph() #Creamos grafo
+Grafo.add_nodes_from(nodos) #   Cargamos los nodos 
+#Colocamos las aristas
+aristas = [(nodos[0], nodos[1]),(nodos[0], nodos[2]),(nodos[0], nodos[3]),
+           (nodos[1], nodos[4]),(nodos[1], nodos[2]),(nodos[2], nodos[3]),
+           (nodos[3], nodos[7]),(nodos[2], nodos[4]),(nodos[2], nodos[5]),
+           (nodos[2], nodos[6]),(nodos[4], nodos[7]),(nodos[5], nodos[7]),
+           (nodos[4], nodos[5]),(nodos[6], nodos[7])]
+
+Grafo.add_edges_from(aristas)   #Se agregan aristas al grafo        
+#Posicionamos los nodos           
+ubicacion = {nodos[0]: (0, 21), 
+             nodos[1]: (5, 42),
+             nodos[2]: (20, 15),
+             nodos[3]: (15, 0),
+             nodos[4]: (30, 42),
+             nodos[5]: (36, 25),
+             nodos[6]: (55, 0),
+             nodos[7]: (60, 21),}
+
+#Colocamos los pesos           
+nx.set_edge_attributes(Grafo, {aristas[0]: {"peso": int(pesos[0])}})
+nx.set_edge_attributes(Grafo, {aristas[1]: {"peso": int(pesos[1])}})
+nx.set_edge_attributes(Grafo, {aristas[2]: {"peso": int(pesos[2])}})
+nx.set_edge_attributes(Grafo, {aristas[3]: {"peso": int(pesos[3])}})
+nx.set_edge_attributes(Grafo, {aristas[4]: {"peso": int(pesos[4])}})
+nx.set_edge_attributes(Grafo, {aristas[5]: {"peso": int(pesos[5])}})
+nx.set_edge_attributes(Grafo, {aristas[6]: {"peso": int(pesos[6])}})
+nx.set_edge_attributes(Grafo, {aristas[7]: {"peso": int(pesos[7])}})
+nx.set_edge_attributes(Grafo, {aristas[8]: {"peso": int(pesos[8])}})
+nx.set_edge_attributes(Grafo, {aristas[9]: {"peso": int(pesos[9])}})
+nx.set_edge_attributes(Grafo, {aristas[10]: {"peso": int(pesos[10])}})
+nx.set_edge_attributes(Grafo, {aristas[11]: {"peso": int(pesos[11])}})
+nx.set_edge_attributes(Grafo, {aristas[12]: {"peso": int(pesos[12])}})
+nx.set_edge_attributes(Grafo, {aristas[13]: {"peso": int(pesos[13])}})
+
+nodes_c= ["red" for x in range(8)] #Marcar todos los nodos en rojo
+# Marcar en verde aquellos que esten en el Path
+if "Estudiar" in Path :
+    nodes_c[int(0)]="green"
+    
+if "Graduarse" in Path :
+    nodes_c[int(1)]="green"
+    
+if "Trabajo" in Path :
+    nodes_c[int(2)]="green"
+    
+if "Ganar Loteria" in Path :
+    nodes_c[int(3)]="green"
+    
+if "Emprender" in Path :
+    nodes_c[int(4)]="green"
+    
+if "Negocios Ilegales" in Path :
+    nodes_c[int(5)]="green"
+
+if "Sugar" in Path :
+    nodes_c[int(6)]="green"
+    
+if "Casa" in Path :
+    nodes_c[int(7)]="green"
+    
+
+pesosg = nx.get_edge_attributes(Grafo, "peso") #Agregamos los pesos 
+nx.draw_networkx_edge_labels(Grafo, pos= ubicacion, edge_labels= pesosg) #Visualizar pesos
+nx.draw(Grafo,pos=ubicacion, with_labels=True, node_color=nodes_c,
+        alpha= 1, style= 'dashed',node_size=600, node_shape= "s",
+        width= 1,font_size=10,font_color= "black",edge_color = "black",)
+plt.show()

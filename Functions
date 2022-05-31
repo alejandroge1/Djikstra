@@ -1,0 +1,84 @@
+import sys
+
+
+class Graph(object):                            #Para crear el grafo
+    def __init__(self, nodes, init_graph):      #Constructor
+        self.nodes = nodes                       #Variable nodos
+        self.graph = self.construct_graph(nodes, init_graph) #Variable grafo
+        
+    def construct_graph(self, nodes, init_graph):#Constructor de grafo
+        graph = {}                                #Diccionario Vacio             
+        for node in nodes:                        #Introduce los grafos
+            graph[node] = {}
+        
+        graph.update(init_graph)                  #Actualiza el diccionario
+        
+        for node, edges in graph.items():
+            for adyacente_node, value in edges.items():  #Coloca las aristas a nodos
+                if graph[adyacente_node].get(node, False) == False:
+                    graph[adyacente_node][node] = value
+                    
+        return graph
+    
+    def get_nodes(self):                     #Retorna los nodos
+        return self.nodes
+    
+    def get_outgoing_aristas(self, node):   #Retorna los  vecinos
+        connections = []
+        for out_node in self.nodes:
+            if self.graph[node].get(out_node, False) != False:
+                connections.append(out_node)
+        return connections
+    
+    def value(self, node1, node2):          #Retorna el peso entre dos nodos
+         return self.graph[node1][node2]
+
+     
+        
+def dijkstra_algorithm(graph, start_node):  #Algoritmo Dijkstra
+    unvisited_nodes = list(graph.get_nodes()) #Lista de nodos no visitados
+ 
+    shortest_path = {}  #Aqui se guarda y actualiza nuestro resultado
+    previous_nodes = {} #Se guardan los caminos previamente tomados
+   
+    max_value = sys.maxsize #Se toman como infinitos los nodos no visitados
+    
+    for node in unvisited_nodes:        #Ciclo para recorrer los nodos
+        shortest_path[node] = max_value #Asigna la variable del valor infinito
+    shortest_path[start_node] = 0 #Inicializa con el nodo "0"
+  
+    while unvisited_nodes: #Hasta visitar todos los nodos...
+    
+        current_min_node = None
+        for node in unvisited_nodes: # Ciclo para recorrer los nodos no visitados
+            if current_min_node == None: #De no encontrar, se hace el minimo
+                current_min_node = node
+            elif shortest_path[node] < shortest_path[current_min_node]:
+                current_min_node = node #De encontrar y ser menor, se hace el minimo
+                
+        neighbors = graph.get_outgoing_aristas(current_min_node) #Toma los vecinos del minimo encontrado
+        for neighbor in neighbors: #Ciclo para recorrer los vecinos
+            tentative_value = shortest_path[current_min_node] + graph.value(current_min_node, neighbor)
+            if tentative_value < shortest_path[neighbor]: #Compara los valores, nuevo y previo
+                shortest_path[neighbor] = tentative_value #De ser el nuevo menor, se convierte el nuevo valor
+                previous_nodes[neighbor] = current_min_node
+ 
+        unvisited_nodes.remove(current_min_node) #Despues de ser visitado, se elimina de la lista
+    
+    return previous_nodes, shortest_path #Retorna el camino y los nodos visitados
+
+def print_result(previous_nodes, shortest_path, start_node, target_node): #Imprimir resultados
+    path = [] #Variable para camino mas corto
+    node = target_node
+    
+    while node != start_node: #Ciclo para guardar los nodos en la variable
+        path.append(node)
+        node = previous_nodes[node]
+ 
+    path.append(start_node) #Se agrega el nodo de inicio
+    
+    print("El camino mas corto para conseguir una casa es de {} puntos".format(int(shortest_path[target_node])))
+    print(" ---> ".join(reversed(path))) #Imprime los nodos visitados en orden
+          
+    return path #camino mas corto
+
